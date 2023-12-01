@@ -45,7 +45,7 @@ def word_to_digit(word):
         last_digit = digit_word_indices[-1][1][1]
         if first_word != last_word:
             word = word.replace(first_word, first_digit, 1)
-            word = word[::-1].replace(last_word[::-1], last_digit[::-1], 1)[::-1]
+            word = word[::-1].replace(last_word[::-1], last_digit, 1)[::-1]
         else:
             word = word.replace(first_word, first_digit)
     return word
