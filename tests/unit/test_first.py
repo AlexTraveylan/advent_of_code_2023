@@ -18,6 +18,20 @@ def test_01_12_2023_v2(input, expected):
     assert sum_calibration_values_v2(input) == expected
 
 
+def test_v2_sum():
+    lines = [
+        "two1nine",
+        "eightwothree",
+        "abcone2threexyz",
+        "xtwone3four",
+        "4nineeightseven2",
+        "zoneight234",
+        "7pqrstsixteen",
+    ]
+
+    assert sum_calibration_values_v2(lines) == 281
+
+
 @pytest.mark.parametrize(
     "input, expected",
     [
@@ -29,3 +43,9 @@ def test_01_12_2023_v2(input, expected):
 )
 def test_01_12_2023_v1(input, expected):
     assert sum_calibration_values(input) == expected
+
+
+def test_v1_sum():
+    lines = ["1abc2", "pqr3stu8vwx", "a1b2c3d4e5f", "treb7uchet"]
+
+    assert sum_calibration_values(lines) == 142
