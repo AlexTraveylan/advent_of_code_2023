@@ -33,9 +33,13 @@ def word_to_digit(word):
     ]
     digit_word_indices = []
     for word_digit in word_digit_pairs:
-        start_index = word.find(word_digit[0])
-        if start_index != -1:
-            digit_word_indices.append((start_index, word_digit))
+        count = word.count(word_digit[0])
+        start_index = 0
+        for _ in range(count):
+            index = word.find(word_digit[0], start_index)
+            if index != -1:
+                digit_word_indices.append((index, word_digit))
+                start_index = index + 1
     digit_word_indices.sort()
 
     if digit_word_indices:
