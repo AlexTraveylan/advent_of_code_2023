@@ -1,5 +1,6 @@
 from pathlib import Path
-import re
+
+from app.main import read_input_file
 
 
 def sum_calibration_values(input_lines):
@@ -12,11 +13,6 @@ def sum_calibration_values(input_lines):
             calibration_value = int(first_digit + last_digit)
             sum_values += calibration_value
     return sum_values
-
-
-def read_input_file(file_path: str):
-    with open(file_path, mode="r", encoding="utf-8") as input_file:
-        return input_file.readlines()
 
 
 def word_to_digit(word):
