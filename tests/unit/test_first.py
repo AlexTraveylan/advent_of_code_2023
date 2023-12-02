@@ -12,6 +12,8 @@ import pytest
         (["4nineeightseven2"], 42),
         (["zoneight234"], 14),
         (["7pqrstsixteen"], 76),
+        (["one1two2three3four4five5six6seven7eight8nine9"], 19),
+        (["oneoneoneoneoneonetwoone"], 11)
     ],
 )
 def test_01_12_2023_v2(input, expected):

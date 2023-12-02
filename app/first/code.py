@@ -15,48 +15,72 @@ def sum_calibration_values(input_lines):
     return sum_values
 
 
-def word_to_digit(word):
-    word_digit_pairs = [
-        ("one", "1"),
-        ("two", "2"),
-        ("three", "3"),
-        ("four", "4"),
-        ("five", "5"),
-        ("six", "6"),
-        ("seven", "7"),
-        ("eight", "8"),
-        ("nine", "9"),
-    ]
-    digit_word_indices = []
-    for word_digit in word_digit_pairs:
-        start_index = word.find(word_digit[0])
-        if start_index != -1:
-            digit_word_indices.append((start_index, word_digit))
-    digit_word_indices.sort()
+def read_input_file(file_path: str):
+    with open(file_path, mode="r", encoding="utf-8") as input_file:
+        return input_file.readlines()
 
-    if digit_word_indices:
-        first_word = digit_word_indices[0][1][0]
-        first_digit = digit_word_indices[0][1][1]
-        last_word = digit_word_indices[-1][1][0]
-        last_digit = digit_word_indices[-1][1][1]
-        if first_word != last_word:
-            word = word.replace(first_word, first_digit, 1)
-            word = word[::-1].replace(last_word[::-1], last_digit, 1)[::-1]
-        else:
-            word = word.replace(first_word, first_digit)
-    return word
+
+DIGITS_DICTIONNARY = {
+    "one": "1",
+    "two": "2",
+    "three": "3",
+    "four": "4",
+    "five": "5",
+    "six": "6",
+    "seven": "7",
+    "eight": "8",
+    "nine": "9",
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+}
+
+
+def find_first_digit(word):
+    index = -1
+    lower_index = 100000000
+    lower_digit = None
+
+    for digit in DIGITS_DICTIONNARY:
+        index = word.find(digit)
+        if index != -1:
+            if index < lower_index:
+                lower_index = index
+                lower_digit = digit
+
+    return DIGITS_DICTIONNARY[lower_digit]
+
+
+def find_last_digit(word):
+    index = -1
+    higher_index = -1
+    higher_digit = None
+
+    for digit in DIGITS_DICTIONNARY:
+        index = word.rfind(digit)
+        if index != -1:
+            if index > higher_index:
+                higher_index = index
+                higher_digit = digit
+
+    return DIGITS_DICTIONNARY[higher_digit]
 
 
 def sum_calibration_values_v2(input_lines):
     sum_values = 0
+
     for line in input_lines:
-        line = word_to_digit(line)
-        digits = [char for char in line if char.isdigit()]
-        if digits:
-            first_digit = digits[0]
-            last_digit = digits[-1]
-            calibration_value = int(first_digit + last_digit)
-            sum_values += calibration_value
+        first_digit = find_first_digit(line)
+        last_digit = find_last_digit(line)
+        calibration_value = int(first_digit + last_digit)
+        sum_values += calibration_value
+
     return sum_values
 
 
