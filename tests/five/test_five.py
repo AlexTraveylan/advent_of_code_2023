@@ -66,3 +66,24 @@ def test_almanac():
     assert almanac.convert_maps[0].convertisseurs[0].destination_range_start == 50
     assert almanac.convert_maps[0].convertisseurs[0].source_range_start == 98
     assert almanac.convert_maps[0].convertisseurs[0].range_length == 2
+
+
+def test_get_line():
+    line = ConvertLine(50, 98, 2)
+
+    assert line.get(98) == 50
+    assert line.get(99) == 51
+    assert line.get(100) == 100
+    assert line.get(20) == 20
+    assert line.get(52) == 52
+
+
+def test_convert_map_get():
+    lines = "seed-to-soil map:", "50 98 2", "52 50 48"
+    convert_map = ConvertMap.from_lines(lines)
+
+    assert convert_map.get(98) == 50
+    assert convert_map.get(99) == 51
+    assert convert_map.get(100) == 100
+    assert convert_map.get(20) == 20
+    assert convert_map.get(52) == 54
