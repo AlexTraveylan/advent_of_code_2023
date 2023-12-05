@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 from numba import njit
 import numpy as np
 from app.five.code import Almanac
@@ -50,6 +51,8 @@ def optimize_seeds(reformatted_seeds, convert_map):
 
 
 if __name__ == "__main__":
+    t_debut = time.perf_counter()
+
     input_path = Path(__file__).parent / "input.txt"
 
     lines = read_input_file(input_path)
@@ -80,4 +83,10 @@ if __name__ == "__main__":
 
     result = optimize_seeds(reformatted_seeds, reformatted_convertmaps)
 
+    t_fin = time.perf_counter()
+
     print(min(result))
+
+    t_minutes = (t_fin - t_debut) // 60
+    t_secondes = (t_fin - t_debut) % 60
+    print(f"Temps d'exécution : {t_minutes} minutes et {t_secondes} secondes.")
