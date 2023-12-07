@@ -117,17 +117,17 @@ def ints(line: str) -> list[int]:
     return list(map(int, line.split()))
 
 
-DAY = 1
-PART = 1
-# s = get_input(DAY).strip()
-s = get_example(DAY).strip()
-begin_time = time.perf_counter()
+if __name__ == "__main__":
+    DAY = 1
+    PART = 1
+    # s = get_input(DAY).strip()
+    s = get_example(DAY).strip()
+    begin_time = time.perf_counter()
 
+    # Your code here
+    ans = 123456
 
-# Your code here
-ans = 123456
-
-# fin du code
-end_time = time.perf_counter()
-submit(DAY, PART, ans)
-print(f"Temps d'exécution : {end_time - begin_time:.2f} secondes")
+    # fin du code
+    end_time = time.perf_counter()
+    print(f"Temps d'exécution : {end_time - begin_time:.2f} secondes")
+    submit(DAY, PART, ans)
