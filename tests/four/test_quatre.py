@@ -1,4 +1,4 @@
-from app.quatre.code import CardParser, part_two
+from app.four.code import CardParser, part_two
 
 
 def test_card_parser():

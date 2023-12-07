@@ -10,7 +10,7 @@ from app.template import get_example, get_input, ints, submit
 
 if __name__ == "__main__":
     DAY = 7
-    PART = 1
+    PART = 2
     exemple_or_real = int(input("Exemple (0) ou Réel (1) ? "))
 
     if exemple_or_real == 0:
@@ -21,13 +21,33 @@ if __name__ == "__main__":
     debut = time.perf_counter()
     # Your code here
 
-    camel_card_keys = "AKQJT98765432"
-    camel_card = {key: i + 2 for i, key in enumerate(camel_card_keys[::-1])}
+    camel_card_keys = "AKQT98765432J"
+    camel_card = {key: i + 1 for i, key in enumerate(camel_card_keys[::-1])}
+
+    reversed_camel_card = {value: key for key, value in camel_card.items()}
 
     def line_into_hand_score(line: str) -> tuple[str, int]:
         """Convert a line into a hand and a score"""
         hand, score = line.split()
         return hand, int(score)
+
+    def max_card(hand: str) -> str:
+        if hand == "JJJJJ":
+            return "J"
+
+        set_hand = list(set(hand))
+        max_card_count = sorted(
+            [(hand.count(card), card) for card in set_hand if card != "J"],
+            key=lambda x: (x[0], camel_card[x[1]]),
+            reverse=True,
+        )
+
+        return max_card_count[0][1]
+
+    def change_J_to_max_count(hand: str) -> str:
+        copy_hand = hand
+        max_card_count = max_card(hand)
+        return copy_hand.replace("J", max_card_count)
 
     def file_into_hands_scores(file: str) -> list[tuple[str, int]]:
         """Convert a file into a list of hands and scores"""
@@ -69,19 +89,21 @@ if __name__ == "__main__":
         return len(set(hand)) == 5
 
     def detect_hand(hand: str) -> int:
-        if is_five_of_a_kind(hand):
+        changed_hand = change_J_to_max_count(hand)
+
+        if is_five_of_a_kind(changed_hand):
             return 7
-        elif is_four_of_a_kind(hand):
+        elif is_four_of_a_kind(changed_hand):
             return 6
-        elif is_full_house(hand):
+        elif is_full_house(changed_hand):
             return 5
-        elif is_three_of_a_kind(hand):
+        elif is_three_of_a_kind(changed_hand):
             return 4
-        elif is_two_pairs(hand):
+        elif is_two_pairs(changed_hand):
             return 3
-        elif is_one_pair(hand):
+        elif is_one_pair(changed_hand):
             return 2
-        elif is_high_card(hand):
+        elif is_high_card(changed_hand):
             return 1
         else:
             raise ValueError("Hand not recognized")

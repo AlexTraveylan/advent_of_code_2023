@@ -73,8 +73,8 @@ def submit(day: int, level: int, answer: str) -> None:
         The answer to submit
     """
 
-    text = "you are about to submit the answer:\n"
-    text += f">>>>>>>>>>>>>>>>> {answer}\n"
+    text = "Envoi de la réponse suivante :\n"
+    text += f"{'>' *5}  {answer} {'<' *5}\n"
     text += "Press enter to continue or Ctrl+C to abort."
     input(text)
 
@@ -120,8 +120,13 @@ def ints(line: str) -> list[int]:
 if __name__ == "__main__":
     DAY = 1
     PART = 1
-    # s = get_input(DAY).strip()
-    s = get_example(DAY).strip()
+    exemple_or_real = int(input("Exemple (0) ou Réel (1) ? "))
+
+    if exemple_or_real == 0:
+        s = get_example(DAY).strip()
+    else:
+        s = get_input(DAY).strip()
+
     begin_time = time.perf_counter()
 
     # Your code here
@@ -130,4 +135,7 @@ if __name__ == "__main__":
     # fin du code
     end_time = time.perf_counter()
     print(f"Temps d'exécution : {end_time - begin_time:.2f} secondes")
-    submit(DAY, PART, ans)
+    if exemple_or_real == 1:
+        submit(DAY, PART, ans)
+    else:
+        print(ans)
