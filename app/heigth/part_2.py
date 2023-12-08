@@ -1,5 +1,6 @@
 import time
 from app.template import get_example, get_input, submit, ints
+import numpy as np
 
 
 class Parser:
@@ -14,6 +15,9 @@ class Parser:
     @classmethod
     def from_lines(cls, lines: str):
         left_right_instructions = lines[0]
+        left_right_in_number = np.array(
+            [0 if x == "L" else 1 for x in left_right_instructions]
+        )
 
         possible_directions = {}
         for line in lines[2:]:
@@ -21,32 +25,64 @@ class Parser:
             left, right = values.split(", ")
             possible_directions[key] = (left[1:], right[:-1])
 
-        return cls(left_right_instructions, possible_directions)
+        return cls(left_right_in_number, possible_directions)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.left_right_instructions}, {self.possible_directions})"
 
 
+def end_condition(x) -> bool:
+    is_end = all(actual_step[-1] == "Z" for actual_step in x)
+
+    return is_end
+
+
 def execute_instructions(parser: Parser) -> int:
     begins = [key for key in parser.possible_directions if key[-1] == "A"]
-    actual_steps = begins.copy()
 
-    def end_condition(x) -> bool:
-        return all(actual_step.endswith("Z") for actual_step in x)
+    actual_steps = begins.copy()
 
     nb_steps = 0
 
     while end_condition(actual_steps) is False:
         for instruction in parser.left_right_instructions:
-            for index, actual_step in enumerate(actual_steps):
-                if instruction == "L":
-                    actual_steps[index] = parser.possible_directions[actual_step][0]
-                elif instruction == "R":
-                    actual_steps[index] = parser.possible_directions[actual_step][1]
+
+            def get_next_step(x) -> str:
+                direction = parser.possible_directions[x][instruction]
+                return direction
+
+            actual_steps = [get_next_step(x) for x in actual_steps]
 
             nb_steps += 1
 
     return nb_steps
+
+
+def ppcm(*n):
+    """Calcul du 'Plus Petit Commun Multiple' de n (>=2) valeurs entières (Euclide)"""
+
+    def _pgcd(a, b):
+        while b:
+            a, b = b, a % b
+        return a
+
+    p = abs(n[0] * n[1]) // _pgcd(n[0], n[1])
+    for x in n[2:]:
+        p = abs(p * x) // _pgcd(p, x)
+    return p
+
+
+def length_cycle(start: str, parser: Parser) -> int:
+    saved_way = [start]
+    actual_step = start
+    while True:
+        for instruction in parser.left_right_instructions:
+            actual_step = parser.possible_directions[actual_step][instruction]
+
+            if actual_step in saved_way:
+                return len(saved_way) - saved_way.index(actual_step)
+
+            saved_way.append(actual_step)
 
 
 if __name__ == "__main__":
@@ -72,10 +108,17 @@ XXX = (XXX, XXX)
     begin_time = time.perf_counter()
 
     parser = Parser.from_lines(s.splitlines())
-    nb_steps = execute_instructions(parser)
+
+    begins = [key for key in parser.possible_directions if key[-1] == "A"]
+
+    cycles = [length_cycle(begin, parser) for begin in begins]
+
+    ans = ppcm(*cycles)
+
+    # steps = execute_instructions(parser)
 
     # Your code here
-    ans = nb_steps
+    # ans = steps
 
     # fin du code
     end_time = time.perf_counter()

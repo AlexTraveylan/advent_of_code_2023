@@ -74,7 +74,7 @@ def submit(day: int, level: int, answer: str) -> None:
     """
 
     text = "Envoi de la réponse suivante :\n"
-    text += f"{'>' *5}  {answer} {'<' *5}\n"
+    text += f"{'>' *5} {answer} {'<' *5}\n"
     text += "Press enter to continue or Ctrl+C to abort."
     input(text)
 
