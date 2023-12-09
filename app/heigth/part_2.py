@@ -79,10 +79,13 @@ def length_cycle(start: str, parser: Parser) -> int:
         for instruction in parser.left_right_instructions:
             actual_step = parser.possible_directions[actual_step][instruction]
 
-            if actual_step in saved_way:
-                return len(saved_way) - saved_way.index(actual_step)
+        if actual_step in saved_way and actual_step[-1] == "Z":
+            cycle = len(saved_way) - saved_way.index(actual_step)
+            decal = len(saved_way) - cycle
 
-            saved_way.append(actual_step)
+            return decal, cycle
+
+        saved_way.append(actual_step)
 
 
 if __name__ == "__main__":
@@ -113,12 +116,17 @@ XXX = (XXX, XXX)
 
     cycles = [length_cycle(begin, parser) for begin in begins]
 
-    ans = ppcm(*cycles)
+    ans = ppcm(*[cycle[1] for cycle in cycles])
+
+    import math
+
+    print(math.prod([cycle[1] for cycle in cycles]))
 
     # steps = execute_instructions(parser)
 
     # Your code here
     # ans = steps
+    ans = ans * len(parser.left_right_instructions)
 
     # fin du code
     end_time = time.perf_counter()
