@@ -1,9 +1,8 @@
-""" Jour 10 part 1 de l'Avent de code 2023."""
+""" Jour 10 part 2 de l'Avent de code 2023."""
 from collections import deque
 import time
-import xlsxwriter
 from typing import Dict, Literal, NamedTuple, Optional
-
+import networkx as nx
 from app.template import get_example, get_input, submit, ints
 
 TypeNode = Literal["S", "|", "-", "L", "J", "7", "F", "."]
@@ -20,6 +19,21 @@ class Node:
 
     def __repr__(self):
         return f"Node({self.coord}, {self.node_type}), {self.neighbors})"
+
+    def points_connexion_possibles(self, max_x: int, max_y: int) -> list[Coord] | None:
+        next_coord_x = self.coord.x + 1 if self.coord.x + 1 < max_x else 0
+        next_coord_y = self.coord.y + 1 if self.coord.y + 1 < max_y else 0
+        previous_coord_x = self.coord.x - 1 if self.coord.x - 1 >= 0 else max_x - 1
+        previous_coord_y = self.coord.y - 1 if self.coord.y - 1 >= 0 else max_y - 1
+
+        connexions = [
+            Coord(next_coord_x, self.coord.y),
+            Coord(self.coord.x, next_coord_y),
+            Coord(previous_coord_x, self.coord.y),
+            Coord(self.coord.x, previous_coord_y),
+        ]
+
+        return connexions
 
     def connexion_possibles(self, max_x: int, max_y: int) -> list[Coord] | None:
         """Return the possible connexions of the node"""
@@ -109,10 +123,7 @@ def bfs(start: Node, nodes: dict[Coord, Node]):
     # After BFS, the node with maximum level is the farthest node
     farthest_node = max(level, key=level.get)
 
-    init_grid = print_grid_with_values(level, max_x, max_y)
-    export_grid_to_excel(init_grid, "grid.xlsx")
-
-    return farthest_node, level[farthest_node]
+    return level, farthest_node, level[farthest_node]
 
 
 def print_grid_with_values(level: Dict[Node, int], max_x: int, max_y: int):
@@ -120,21 +131,9 @@ def print_grid_with_values(level: Dict[Node, int], max_x: int, max_y: int):
     init_grid = [["." for _ in range(max_x)] for _ in range(max_y)]
 
     for node, value in level.items():
-        init_grid[node.coord.y][node.coord.x] = str(node.node_type)
+        init_grid[node.coord.y][node.coord.x] = str(value)
 
     return init_grid
-
-
-def export_grid_to_excel(grid: list[list[str]], filename: str):
-    """Export the grid to an excel file"""
-
-    workbook = xlsxwriter.Workbook(filename)
-    worksheet = workbook.add_worksheet()
-
-    for row_num, row_data in enumerate(grid):
-        worksheet.write_row(row_num, 0, row_data)
-
-    workbook.close()
 
 
 def detect_start_node_type(start_node: Node, nodes: dict[Coord, Node]):
@@ -198,17 +197,39 @@ def make_connexion(nodes: dict[Coord, Node], max_x: int, max_y: int, start_node:
         node.neighbors = neighbours_possible
 
 
+def make_points_connexions(nodes_point: Dict[Coord, Node], max_x, max_y):
+    """Make the connexions between the nodes"""
+
+    for node in nodes_point.values():
+        connexions = node.points_connexion_possibles(max_x, max_y)
+
+        if connexions is None:
+            continue
+
+        neighbours_possible = []
+        for neighbour_coord in connexions:
+            neighbour = nodes_point.get(neighbour_coord)
+            if neighbour is None:
+                continue
+            neighbour_connexions = neighbour.points_connexion_possibles(max_x, max_y)
+
+            if node.coord in neighbour_connexions:
+                neighbours_possible.append(neighbour_coord)
+
+        node.neighbors = neighbours_possible
+
+
 if __name__ == "__main__":
     DAY = 10
-    PART = 1
+    PART = 2
     exemple_or_real = int(input("Exemple 1 ou exemple 2 ou exemple 3 ou Réel 5 ? "))
 
     if exemple_or_real == 1:
-        s = get_example(DAY, offset=1).replace("<em>", "").replace("</em>", "").strip()
+        s = get_example(DAY, offset=9).replace("<em>", "").replace("</em>", "").strip()
     elif exemple_or_real == 2:
-        s = get_example(DAY, offset=3).strip()
+        s = get_example(DAY, offset=12).strip()
     elif exemple_or_real == 3:
-        s = get_example(DAY, offset=4).strip()
+        s = get_example(DAY, offset=15).strip()
     else:
         s = get_input(DAY).strip()
 
@@ -222,8 +243,30 @@ if __name__ == "__main__":
     start_node = next((node for node in nodes.values() if node.node_type == "S"), None)
     make_connexion(nodes, max_x, max_y, start_node)
 
-    farthest_node, ans = bfs(start_node, nodes)
-    print(f"node le plus loin : {farthest_node}, distance : {ans}")
+    level, farthest_node, max_distance = bfs(start_node, nodes)
+    print(f"node le plus loin : {farthest_node}, distance : {max_distance}")
+
+    blank_grid = [["." for _ in range(max_x)] for _ in range(max_y)]
+    for node in level:
+        blank_grid[node.coord.y][node.coord.x] = "x"
+
+    nodes_point = {}
+    for y, line in enumerate(blank_grid):
+        for x, value in enumerate(line):
+            if value == ".":
+                nodes_point[Coord(x, y)] = Node(Coord(x, y), ".")
+
+    make_points_connexions(nodes_point, max_x, max_y)
+
+    center_node = nodes_point.get(Coord(69, 60))
+    level_point, farthest_node_point, max_distance_point = bfs(center_node, nodes_point)
+    ans = 0
+    print()
+    for node in nodes_point.values():
+        level_point, farthest_node_point, max_distance_point = bfs(node, nodes_point)
+
+        if max_distance_point < 35:
+            ans += 1
 
     # fin du code
     end_time = time.perf_counter()
