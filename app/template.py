@@ -57,7 +57,9 @@ def get_example(day: int, offset=0) -> str:
         headers={"cookie": "session=" + AOC_COOKIE},
         timeout=5,
     )
-    return req.text.split("<pre><code>")[offset + 1].split("</code></pre>")[0]
+    blocks = req.text.split("<pre><code>")
+
+    return blocks[offset + 1].split("</code></pre>")[0]
 
 
 def submit(day: int, level: int, answer: str) -> None:
